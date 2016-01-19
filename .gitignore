@@ -1,0 +1,8 @@
+#any text files created by the program
+*.txt
+
+#any of these
+*.pyc
+
+#backups...
+*.*~
