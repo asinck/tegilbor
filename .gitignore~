@@ -1,5 +1,0 @@
-#any text files created by the program
-*.txt
-
-#any pickles
-*.pyc
