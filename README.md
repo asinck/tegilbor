@@ -32,4 +32,7 @@ Bugs:
 * The text doesn't always auto-scroll to the bottom when a binding is looked up.
 
 Notes:
+
+I'm probably going to change bindings around once I decide which ones are most important and where they should be put so that they're easiest to hit. 
+
 Tegilbor is elvish for writer. See http://elf.namegeneratorfun.com/ .
