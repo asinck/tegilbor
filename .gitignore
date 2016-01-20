@@ -1,7 +1,7 @@
 #any text files created by the program
 *.txt
 
-#any of these
+#hold the pickles
 *.pyc
 
 #backups...
