@@ -1,4 +1,4 @@
-I wrote this program so that I could type quickly with shorthand. For example, typing "program" can be done by typing ctrl-p ctrl-G (capitalization is important). In theory, this means that I will be able to type much more quickly, hopefully at talking speed. 
+I wrote this program so that I could type quickly with shorthand. For example, typing "the program" can be done by typing ctrl-f space ctrl-/ ctrl-? (capitalization is important). In theory, this means that I will be able to type much more quickly, hopefully at talking speed. 
 
 Explanation of the Program:
 
@@ -31,8 +31,12 @@ Bugs:
 * Some keys don't actually work; possibly due either to the OS not allowing it, or the keyboard not being able to handle it.
 * The text doesn't always auto-scroll to the bottom when a binding is looked up.
 
+Upcoming enhancements:
+* Allow the user to save something without a timestamp on the file. 
+* Automatically generated quickdefs.
+
 Notes:
 
-I'm probably going to change bindings around once I decide which ones are most important and where they should be put so that they're easiest to hit. 
+The bindings for the keys may change occasionally, as I see fit. 
 
 Tegilbor is elvish for writer. See http://elf.namegeneratorfun.com/ .
