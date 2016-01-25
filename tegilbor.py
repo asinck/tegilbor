@@ -39,9 +39,13 @@ def toggleTimestamp(var=None):
     timestampButton.configure(text = newText)
     print timestamp
     timestamp = not timestamp
+
+#save() is a seriously poorly written function. rewriting it is on my
+#to-do list.
 def save():
     global fileName, timestamp
     print "Filename is:", fileName
+    newFile = False
     write = True
     if (fileName == ""):
         print "getting new filename"
@@ -58,19 +62,23 @@ def save():
                 print "making timestamp"
                 currentTime = "_" + time.strftime("[%m-%d-%Y]_%H.%M.%S", time.localtime())
             fileName = className + currentTime + ".txt"
+            newFile = True
             
     if (write):
-        myFile = None
-        #if I can open it, it means that it already exists
-        try:
-            myFile = open(fileName, "r")
-            myFile.close()
-            print "File already exists"
-            warningLabel.config(text = "File already exists.")
-            print "resetting fileName"
-            fileName = ""
-            topFrame.configure(bg="#CC0000")
-        except:
+        saveFile = False
+        if (newFile):
+            #if I can open it, it means that it already exists
+            try:
+                myFile = open(fileName, "r")
+                myFile.close()
+                print "File already exists"
+                warningLabel.config(text = "File already exists.")
+                print "resetting fileName"
+                fileName = ""
+                topFrame.configure(bg="#CC0000")
+            except:
+                saveFile = True
+        if (saveFile):
             print "File does not exist"
             myFile = open(fileName, "w+")
             contents = textArea.get(1.0, END)
@@ -80,6 +88,7 @@ def save():
             topFrame.configure(bg="#" + color)
             warningLabel.config(text = "")
             print "Saved."
+            
 
 def makeQuickDef(frame):
     myFrame = Frame(frame)
