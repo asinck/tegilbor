@@ -6,7 +6,8 @@ imports = [
     "import Tkinter as tk",
     "from ScrolledText import ScrolledText",
     "from keybindings import *",
-    "import time"
+    "import time",
+    "import random"
 ]
 #failedPackages will keep a record of the names of the packages that
 #failed to import, so that the program can go through the entire list
@@ -29,41 +30,56 @@ if len(failedPackages) > 0:
 fileName = ""
 #lastlen keeps track of the length of the most recent insertion, for backspace
 lastLen = 0
-quickDefs = {" ":"?  "}
+quickDefs = {}
+timestamp = True
 
-# def resize(event):
-#     size = (innerTextFrame.winfo_reqwidth(), innerTextFrame.winfo_reqheight())
-#     canvas.config(scrollregion="0 0 %s %s" % size)
-
-# def scroll(event):
-#     direction = 1
-#     if event.num == 4:
-#         direction = -1
-#     canvas.yview_scroll(direction, "units")
-
+def toggleTimestamp(var=None):
+    global timestamp
+    newText = "turn timestamp on" if timestamp else "turn timestamp off" 
+    timestampButton.configure(text = newText)
+    print timestamp
+    timestamp = not timestamp
 def save():
-    global fileName
-    print fileName
+    global fileName, timestamp
+    print "Filename is:", fileName
+    write = True
     if (fileName == ""):
+        print "getting new filename"
         className = classNameField.get()
         if (className == ""):
-            topFrame.configure(bg="RED")
+            print "entry field empty..."
+            warningLabel.config(text = "Filename?")
+            topFrame.configure(bg="#CC0000")
+            write = False
         else:
-            topFrame.configure(bg="GRAY")
-            timestamp = time.strftime("[%m-%d-%Y]_%H.%M.%S", time.localtime())
-            fileName = className + "_" + timestamp + ".txt"
-            contents = textArea.get(1.0, END)
+            print "making filename"
+            currentTime = ""
+            if timestamp:
+                print "making timestamp"
+                currentTime = "_" + time.strftime("[%m-%d-%Y]_%H.%M.%S", time.localtime())
+            fileName = className + currentTime + ".txt"
+            
+    if (write):
+        myFile = None
+        #if I can open it, it means that it already exists
+        try:
+            myFile = open(fileName, "r")
+            myFile.close()
+            print "File already exists"
+            warningLabel.config(text = "File already exists.")
+            print "resetting fileName"
+            fileName = ""
+            topFrame.configure(bg="#CC0000")
+        except:
+            print "File does not exist"
             myFile = open(fileName, "w+")
+            contents = textArea.get(1.0, END)
             myFile.write(contents)
             myFile.close()
-            print "File Created."
-    else:
-        topFrame.configure(bg="GRAY")
-        contents = textArea.get(1.0, END)
-        myFile = open(fileName, "w+")
-        myFile.write(contents)
-        myFile.close()
-        print "Saved."
+            color = ("%x" %random.randint(204,255)).zfill(2)*3
+            topFrame.configure(bg="#" + color)
+            warningLabel.config(text = "")
+            print "Saved."
 
 def makeQuickDef(frame):
     myFrame = Frame(frame)
@@ -162,7 +178,8 @@ def insert(string):
     global lastLen
     lastLen = len(string)
     textArea.insert(INSERT, string)
-    if (textArea.get("%s-2c" % INSERT, "%s-1c" % INSERT) == '?'):
+    if (textArea.get("%s-2c" % INSERT, "%s-1c" % INSERT) == '?') and \
+    (textArea.get("%s-1c" % INSERT, "%s" % INSERT) != ' '):
         findQuickDef(textArea.get("%s-1c" % INSERT, INSERT))
     textArea.tag_add("all", "1.0", "%s" %END)
     textArea.tag_config("all", background="white", foreground="black")
@@ -185,6 +202,8 @@ textArea = ScrolledText(textFrame, wrap=WORD)
 
 classNameField = Entry(topFrame, width = 6)
 saveButton = Button(topFrame, text = "Save", command = lambda: save())
+timestampButton = Button(topFrame, text = "turn timestamp off" , command = lambda: toggleTimestamp())
+warningLabel = Label(topFrame, text = "")
 
 lookupFrame = Frame(rightFrame)
 quickDefLookupEntry = Entry(lookupFrame, width = 5)
@@ -224,6 +243,8 @@ textFrame.pack(expand=YES, side=BOTTOM, fill=BOTH)
 
 classNameField.pack(side=LEFT)
 saveButton.pack(side=LEFT)
+timestampButton.pack(side=LEFT)
+warningLabel.pack(side=LEFT)
 textEntry.pack(side=RIGHT)
 
 textArea.pack(expand=YES, fill=BOTH)
