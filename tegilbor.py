@@ -65,7 +65,7 @@ def save():
             newFile = True
             
     if (write):
-        saveFile = False
+        saveFile = True
         if (newFile):
             #if I can open it, it means that it already exists
             try:
@@ -76,6 +76,7 @@ def save():
                 print "resetting fileName"
                 fileName = ""
                 topFrame.configure(bg="#CC0000")
+                saveFile = False
             except:
                 saveFile = True
         if (saveFile):
