@@ -33,6 +33,7 @@ Bugs:
 
 Upcoming enhancements:
 * Allow the user to save something without a timestamp on the file. 
+* Warn the user if they try to exit the program without saving the file.
 * Automatically generated quickdefs.
 
 Notes:
