@@ -83,10 +83,10 @@ def edit(tabName, sameTab=False):
 #    if not sameTab:
 #        tabs[currentTab].configure(bg = "#FFF")
 #    tabs[tabName].configure(bg = "#CCC")
-    root.title(currentTab + " - Tegilbor Speed Text Editor")
     openDocuments[currentTab].pack_forget()
-    openDocuments[tabName].pack()
+    openDocuments[tabName].pack(fill = BOTH, expand=YES)
 #    openDocuments[tabName].focus_set()
+    root.title(tabName + " - Tegilbor Speed Text Editor")
     currentTab = tabName
 
 #make a new document
@@ -117,7 +117,8 @@ def openAFile(fileName):
             tabs[fileName] = tabs[currentTab]
             del tabs[currentTab]
             #put the file in the document area
-            openDocuments[fileName] = Text(mainFrame, height=28, width=80)
+            openDocuments[fileName] = ScrolledText(mainFrame, wrap=WORD)
+            #Text(mainFrame, height=28, width=80)
             edit(fileName, True)
             openDocuments[fileName].insert(END, s)
             tabs[fileName].configure(bg = "#FFF")
@@ -128,7 +129,8 @@ def openAFile(fileName):
             tabs[fileName].configure(command = lambda: edit(fileName))
             tabs[fileName].pack(side=LEFT)
             #put the file in the document area
-            openDocuments[fileName] = Text(mainFrame, height=28, width=80)
+            openDocuments[fileName] = ScrolledText(mainFrame, wrap=WORD)
+            #Text(mainFrame, height=28, width=80)
             edit(fileName)
             openDocuments[fileName].insert(END, s)
             tabs[fileName].configure(bg = "#FFF")
@@ -198,7 +200,7 @@ def newDoc(var=None):
     tabs[s].pack(side=LEFT)
     
     #make the document
-    openDocuments[s] = ScrolledText(mainFrame, wrap=WORD, height=28, width=80)
+    openDocuments[s] = ScrolledText(mainFrame, wrap=WORD)#, height=28, width=80)
     
     edit(s)
     currentTab = s
@@ -337,8 +339,8 @@ except:
 leftFrame = Frame(root)
 rightFrame = Frame(root)
 
-leftFrame.pack(expand=YES, side=LEFT, fill=BOTH)
 rightFrame.pack(side=RIGHT, fill="y")
+leftFrame.pack(expand=YES, side=LEFT, fill=BOTH)
 
 #menus and text entry
 topBar = Frame(leftFrame, bg="#3C3B37")
@@ -385,11 +387,11 @@ tabs["Untitled 1"].configure(command = lambda: edit("Untitled 1"))
 tabs["Untitled 1"].configure(bg = "#FFF")
 tabs["Untitled 1"].pack(side=LEFT)
 mainFrame = Frame(leftFrame)
-mainFrame.pack(side=TOP, fill=BOTH)
+mainFrame.pack(side=TOP, fill=BOTH, expand=YES)
 
 #initialize a document
-openDocuments["Untitled 1"] = ScrolledText(mainFrame, wrap=WORD, height=28, width=80)
-openDocuments["Untitled 1"].pack()
+openDocuments["Untitled 1"] = ScrolledText(mainFrame, wrap=WORD)#, height=28, width=80)
+openDocuments["Untitled 1"].pack(fill = BOTH, expand=YES)
 #openDocuments["Untitled 1"].focus_set()
 #setKeyBindings("Untitled 1")
 
