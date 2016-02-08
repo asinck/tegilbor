@@ -38,6 +38,7 @@ currentTab = "Untitled 1" #this is the name of the initial tab
 openDocuments = {}        #a hash table of documents
 tabs = {}                 #a hash table of the tabs that will allow the
 unnamedDocs = 1           #user to have multiple tabs open at once
+quickDefs = {}
 #functions
 
 #notDone will give a message saying that that feature is not complete
