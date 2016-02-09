@@ -309,7 +309,7 @@ def backspace(var=None):
     for i in range(lastLen):
         openDocuments[currentTab].delete("%s-1c" % INSERT, INSERT)
     lastLen = 1
-
+    
 #this does the insertion into the editor window.
 def insert(string):
     global lastLen, currentTab
@@ -377,7 +377,7 @@ textEntry.bind("<BackSpace>", lambda x: backspace())
 textEntry.bind(ctrl+"BackSpace>", lambda x: deleteWord())
 root.bind("<Escape>", lambda x: save())
 textEntry.bind("<Control-Return>", lambda x: quickDefLookupEntry.focus_set())
-
+textEntry.bind("<Control-space>", lambda x: insert("    ")) #I don't know if this will work
 
 #these are the tabs for multiple files
 tabsFrame = Frame(leftFrame, bg = "#3C3B37") #magic value for a tone of gray
