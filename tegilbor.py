@@ -186,6 +186,7 @@ def saveAsThis(fileName):
     text = open(fileName, 'w+')
     contents = openDocuments[fileName].get(1.0, END)
     text.write(contents)
+    root.title(currentTab + " - Tegilbor Speed Text Editor")
     tabs[currentTab].configure(bg = "#FFF")
 
 #this opens a new document
