@@ -34,7 +34,6 @@ Bugs:
 * The auto-scroll to cursor may not always work when a binding is looked up.
 * The highlighting that tells the user where the cursor is is a bit messed up.
 * Editing the file directly instead of with the speed entry box doesn't turn the tab gray to indicate that the tab is not saved.
-* The program should not allow the user to try to save a file without a name.
 * The highlight that indicates where the user is typing might accidentally black out some of the user's text (unconfirmed).
 
 Upcoming enhancements:
