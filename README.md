@@ -6,7 +6,7 @@ This program adds speed typing abilities to my other text editor, located at htt
 
 ###Explanation of the Program:
 
-This program has the standard capabilities; that is, it can open, edit, and save files, and have multiple files open at the same time.
+This program has the standard capabilities; that is, it can open, edit, and save files, and have multiple files open at the same time. It also has the following:
 
 ####Tabs:
 The tabs show the file that each tab holds. Clicking on a tab will show that file. If a file is saved, the tab will be white. If the file has been edited via the speed entry box since the last save, the tab will be gray.
@@ -28,7 +28,7 @@ The little [+] next to a quickdef adds that quickdef to the program (for the cur
 
 The [+] at the bottom right is to add a quickdef slot.
 
-####Installation Notes:
+###Installation Notes:
 This program uses the Tkinter library. If Tkinter is not installed, you can't use the program. If you aren't sure, you can try to run the program, and it will let you know. 
 
 ###Bugs:
