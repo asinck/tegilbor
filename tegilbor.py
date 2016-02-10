@@ -42,6 +42,8 @@ openDocuments = {}        #a hash table of documents
 tabs = {}                 #a hash table of the tabs that will allow the
 unnamedDocs = 1           #user to have multiple tabs open at once
 quickDefs = {}
+
+
 #functions
 
 #notDone will give a message saying that that feature is not complete
@@ -83,12 +85,8 @@ def currentTabIsUnedited():
 #this is used for switching tabs
 def edit(tabName, sameTab=False):
     global currentTab
-#    if not sameTab:
-#        tabs[currentTab].configure(bg = "#FFF")
-#    tabs[tabName].configure(bg = "#CCC")
     openDocuments[currentTab].pack_forget()
     openDocuments[tabName].pack(fill = BOTH, expand=YES)
-#    openDocuments[tabName].focus_set()
     root.title(tabName + " - Tegilbor Speed Text Editor")
     currentTab = tabName
 
@@ -164,6 +162,9 @@ def saveAsThis(fileName):
     global currentTab, unnamedDocs
     #get the file name to save as; if it exists make sure that the user
     #meant to save the file with that name
+    if (fileName == ""):
+        tkMessageBox.showerror("Error", "Invalid file name.")
+        return
     try:
         text = open(fileName, 'r')
         message = "This file already exists. Save anyway?"
@@ -261,6 +262,7 @@ def makeQuickDef(frame):
 #this defines a new quickdef, or redefines an existing quickdef
 def quickDef(key, word):
     quickDefs[key] = word
+    textEntry.focus_set()
 
 #this deletes a quickdef, if possible
 def deleteQuickDef(key):
@@ -358,7 +360,7 @@ menu.add_command(label = 'New document', command = newDoc, underline = 0)
 menu.add_command(label = 'Open...', command = openFile, underline = 0)
 menu.add_command(label = 'Save', command = save, underline = 0)
 menu.add_command(label = 'Save As...', command =saveAs, underline = 5)
-menu.add_command(label = 'Quit', command = quit, underline = 0)
+menu.add_command(label = 'Quit', command = warn, underline = 0)
 fileMenu['menu'] = menu
 
 #for the text entry
