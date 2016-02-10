@@ -1,6 +1,9 @@
 #Adam Sinck
-#This is a text editor I wrote for fun, and to see if I could
 
+#This was originally a text editor I wrote for fun, and to see if I
+#could. I have expanded it to be able to accept a lot of key bindings,
+#so that I could type with shorthand. The original editor is at
+#https://github.com/asinck/amdiron .
 
 #this is a list of import commands. If the user doesn't have Tkinter
 #or other libraries installed, it will fail gracefully instead of
