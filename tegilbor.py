@@ -14,9 +14,9 @@ imports = [
     "import tkMessageBox",
     "from ScrolledText import ScrolledText",
     "from keybindings import *",
-    "import hashlib",
-    "import time",
-    "import random"
+    # "import hashlib",
+    # "import time",
+    # "import random"
 ]
 #failedPackages will keep a record of the names of the packages that
 #failed to import, so that the program can go through the entire list
@@ -29,7 +29,7 @@ for i in imports:
         exec(i)
     except ImportError as error:
         failedPackages += str(error) + '\n'
-#if there were any errors in the imports, tell the users what packages
+#if there were any errors in the imports, tell the user what packages
 #didn't import, and exit.
 if len(failedPackages) > 0:
     print "Some packages could not be imported:"
@@ -109,12 +109,12 @@ def openAFile(fileName):
             #edit the current tab
             #change the display name of the current tab
             tabs[currentTab].configure(text = fileName)
-            #make the command of the current tab be to edit the document with
-            #the filename
+            #make the command of the current tab be to edit the
+            #document with the filename
             tabs[currentTab].configure(command = lambda: edit(fileName))
-            #make a new entry in tabs, and make it point to the current tab
-            #this makes it so that the key that points to the tab matches
-            #the filename
+            #make a new entry in tabs, and make it point to the current
+            #tab this makes it so that the key that points to the tab
+            #matches the filename
             tabs[fileName] = tabs[currentTab]
             del tabs[currentTab]
             #put the file in the document area
@@ -149,8 +149,20 @@ def save(var=None):
 #this pops up a message to the user when the close the program,
 #reminding them to save everything.
 def warn():
+    #this is the current solution, until I'm sure that the tab
+    #coloring doesn't have any bugs
     if tkMessageBox.askokcancel("Save?", "Have you saved everything?"):
         root.destroy()
+
+    #This depends on the tabs _always_ being properly colored, whether
+    #they were edited with the entry box or directly.
+    # unsavedChanges = False
+    # for tab in tabs:
+    #     if [tab].cget("bg") != "#FFF":
+    #         unsavedChanges = True
+    # if unsavedChanges:
+    #     if tkMessageBox.askokcancel("Save?", "Have you saved everything?"):
+    #         root.destroy()
 
 
 #this pops up a window for saving a document with a different name
@@ -284,9 +296,14 @@ def findQuickDef(key):
 #this lets the user look up a binding
 def lookup():
     global currentTab
+    #get the string that the user wants to look up, clear the entry
+    #box, and refocus the text entry box
     string = quickDefLookupEntry.get()
     quickDefLookupEntry.delete(0, 'end')
     textEntry.focus_set()
+
+    #go through all the bindings, searching for the ones that have the
+    #search string
     results = []
     if (string != ''):
         for key in bindings:
@@ -295,6 +312,8 @@ def lookup():
                 results.append(s)
         results = sorted(results, key=len)
     lookupLabel.config(text='\n'.join(results))
+    #this might be an issue...if this focuses on the end, instead of
+    #the current cursor position
     openDocuments[currentTab].see("end")
     
 #this is a ctrl-backspace (delete previous word)
@@ -305,6 +324,7 @@ def deleteWord(var=None):
     while char not in " _\n.,":
         openDocuments[currentTab].delete("%s-1c" % INSERT, INSERT)
         char = openDocuments[currentTab].get("%s-1c" % INSERT, INSERT)
+    status()
 
 #this adds special functionality to backspace, so that it deletes the
 #last insertion, instead of the last character. This is helpful when you
@@ -314,20 +334,46 @@ def backspace(var=None):
     for i in range(lastLen):
         openDocuments[currentTab].delete("%s-1c" % INSERT, INSERT)
     lastLen = 1
+    status()
+
+#this takes the line.col string and returns a nicer representaton
+def getPosition(s):
+    (line,col) = s.split(".")
+    return "(%s:%s)" %(line,col)
     
-#this does the insertion into the editor window.
-def insert(string):
-    global lastLen, currentTab
-    lastLen = len(string)
-    tabs[currentTab].configure(bg = "#CCC")
-    openDocuments[currentTab].insert(INSERT, string)
-    if (openDocuments[currentTab].get("%s-2c" % INSERT, "%s-1c" % INSERT) == '?') and \
-    (openDocuments[currentTab].get("%s-1c" % INSERT, "%s" % INSERT) != ' '):
-        findQuickDef(openDocuments[currentTab].get("%s-1c" % INSERT, INSERT))
+#this will update the program with the current status
+# - line and column number
+# - saved or not saved
+# - cursor position highlighting
+def status(saved=False):
+
+    #this does the current position highlighting
+    #this should be changed to a) remove all irrelevant tags, and
+    #    b) also track the main text window, not just the text entry
     openDocuments[currentTab].tag_add("all", "1.0", "%s" %END)
     openDocuments[currentTab].tag_config("all", background="white", foreground="black")
     openDocuments[currentTab].tag_add("cursor", str(INSERT), "%s+1c" %INSERT)
     openDocuments[currentTab].tag_config("cursor", background="black", foreground="white")
+
+    #this will give the user an indication of if the file is saved or not
+    if (not saved):
+        tabs[currentTab].configure(bg = "#CCC")
+    else:
+        tabs[currentTab].configure(bg = "#FFF")
+
+    #this will tell the user the current line and column number
+    #print "%s" %openDocuments[currentTab].END#openDocuments[currentTab].INSERT
+    positionLabel.config(text=getPosition(openDocuments[currentTab].index(INSERT)))
+
+#this does the insertion into the editor window.
+def insert(string):
+    global lastLen, currentTab
+    lastLen = len(string)
+    openDocuments[currentTab].insert(INSERT, string)
+    if (openDocuments[currentTab].get("%s-2c" % INSERT, "%s-1c" % INSERT) == '?') and \
+    (openDocuments[currentTab].get("%s-1c" % INSERT, "%s" % INSERT) != ' '):
+        findQuickDef(openDocuments[currentTab].get("%s-1c" % INSERT, INSERT))
+    status()
     openDocuments[currentTab].see(str(INSERT))
 
 
@@ -392,8 +438,15 @@ tabs["Untitled 1"] = (Button(tabsFrame, text = currentTab))
 tabs["Untitled 1"].configure(command = lambda: edit("Untitled 1"))
 tabs["Untitled 1"].configure(bg = "#FFF")
 tabs["Untitled 1"].pack(side=LEFT)
+tabs["Untitled 1"].bind("<Key>", lambda: status())
 mainFrame = Frame(leftFrame)
 mainFrame.pack(side=TOP, fill=BOTH, expand=YES)
+
+statusBar = Frame(leftFrame)
+positionLabel = Label(statusBar, text = "(1:0)")
+
+statusBar.pack(side=BOTTOM, fill="x")
+positionLabel.pack(side=RIGHT)
 
 #initialize a document
 openDocuments["Untitled 1"] = ScrolledText(mainFrame, wrap=WORD)#, height=28, width=80)
