@@ -34,7 +34,6 @@ This program uses all sorts of libraries. If one of them is not installed, you c
 ###Bugs:
 * Some keys don't actually work; possibly due either to the OS not allowing it, or the keyboard not being able to handle it.
 * The auto-scroll to cursor may not always work when a binding is looked up.
-* Editing the file directly instead of with the speed entry box doesn't turn the tab gray to indicate that the tab is not saved.
 * The highlight that indicates where the user is typing might accidentally black out some of the user's text (unconfirmed).
 * Quickdef definitions can have issues if the same key is defined twice, especially if one of those two is deleted.
 * The length sorting for the lookup does not work properly.
@@ -45,7 +44,6 @@ This program uses all sorts of libraries. If one of them is not installed, you c
 #####Text area:
 * Remember indentation.
 * Line numbers.
-* Bind arrow keys to move around in the file.
 * Let ctrl-backspace delete a string of whitespace.
 #####Quickdefs:
 * Automatically generated quickdefs.
