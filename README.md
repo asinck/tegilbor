@@ -37,12 +37,24 @@ This program uses all sorts of libraries. If one of them is not installed, you c
 * The highlighting that tells the user where the cursor is is a bit messed up.
 * Editing the file directly instead of with the speed entry box doesn't turn the tab gray to indicate that the tab is not saved.
 * The highlight that indicates where the user is typing might accidentally black out some of the user's text (unconfirmed).
+* Quickdef definitions can have issues if the same key is defined twice, especially if one of those two is deleted.
+* The length sorting for the lookup does not work properly.
 
 ###Upcoming enhancements:
+#####File handling 
 * Warn the user if they try to exit the program without saving the file, instead of just warning them to make sure they saved everything.
-* Automatically generated quickdefs.
 * Allow the program to generate timestamps to append to the filename.
+#####Text area:
 * Remember indentation.
+* Line numbers and a (line:col) indication.
+* Bind arrow keys to move around in the file.
+* Let ctrl-backspace delete a string of whitespace.
+#####Quickdefs:
+* Automatically generated quickdefs.
+* Make it clearer what buttons go to which quickdef, when there are a lot of quickdefs defined.
+* Let the quickdef section scroll if needed.
+#####Other:
+* Allow the user to close tabs.
 * Fix the readme to not switch between first, third, and second person.
 
 ###Notes:
