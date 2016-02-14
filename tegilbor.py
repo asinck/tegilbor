@@ -150,6 +150,7 @@ def save(var=None):
     contents = openDocuments[currentTab].get(1.0, END)
     text.write(contents)
     tabs[currentTab].configure(bg = "#FFF")
+
 #this pops up a message to the user when the close the program,
 #reminding them to save everything.
 def warn():
