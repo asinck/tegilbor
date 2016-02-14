@@ -80,15 +80,19 @@ def destroyThis(window):
 
 #this will check to see if the current tab has been edited
 def currentTabIsUnedited():
-    return openDocuments[currentTab].get(1.0, END) == '\n'
+    global currentTab
+    empty = openDocuments[currentTab].get(1.0, END) == '\n'
+    unnamed = "Untitled" in currentTab
+    return empty and unnamed
 
 #this is used for switching tabs
 def edit(tabName, sameTab=False):
     global currentTab
     openDocuments[currentTab].pack_forget()
-    openDocuments[tabName].pack(fill = BOTH, expand=YES)
-    root.title(tabName + " - Tegilbor Speed Text Editor")
     currentTab = tabName
+    openDocuments[currentTab].pack(fill = BOTH, expand=YES)
+    root.title(currentTab + " - Tegilbor Speed Text Editor")
+    openDocuments[currentTab].bind("<Key>", lambda x: status())
 
 #make a new document
 def openFile():
@@ -149,20 +153,15 @@ def save(var=None):
 #this pops up a message to the user when the close the program,
 #reminding them to save everything.
 def warn():
-    #this is the current solution, until I'm sure that the tab
-    #coloring doesn't have any bugs
-    if tkMessageBox.askokcancel("Save?", "Have you saved everything?"):
-        root.destroy()
-
     #This depends on the tabs _always_ being properly colored, whether
     #they were edited with the entry box or directly.
-    # unsavedChanges = False
-    # for tab in tabs:
-    #     if [tab].cget("bg") != "#FFF":
-    #         unsavedChanges = True
-    # if unsavedChanges:
-    #     if tkMessageBox.askokcancel("Save?", "Have you saved everything?"):
-    #         root.destroy()
+    unsavedChanges = False
+    for tab in tabs:
+        if [tab].cget("bg") != "#FFF":
+            unsavedChanges = True
+    if unsavedChanges:
+        if tkMessageBox.askokcancel("Save?", "Have you saved everything?"):
+            root.destroy()
 
 
 #this pops up a window for saving a document with a different name
@@ -222,6 +221,7 @@ def newDoc(var=None):
     edit(s)
     currentTab = s
     tabs[currentTab].configure(bg = "#FFF")
+    
 
 #this makes a new quick def
 def makeQuickDef(frame):
@@ -336,6 +336,12 @@ def backspace(var=None):
     lastLen = 1
     status()
 
+
+#this checks to make sure a function call is working
+def functionCheck(var=None):
+    print "Function call is working. Value is", var
+
+#this moves the cursor around
 def setCursor(line, col):
     (currentLine, currentCol) = getPosition()
     newLine = currentLine + line
@@ -358,7 +364,7 @@ def status(saved=False):
     #this should be changed to a) remove all irrelevant tags, and
     #    b) also track the main text window, not just the text entry
     openDocuments[currentTab].tag_delete("cursor")
-    openDocuments[currentTab].tag_add("cursor", str(INSERT), "%s+1c" %INSERT)
+    openDocuments[currentTab].tag_add("cursor", str(INSERT), "%s.%s+1c" %getPosition())
     openDocuments[currentTab].tag_config("cursor", background="black", foreground="white")
 
     #this will give the user an indication of if the file is saved or not
@@ -448,7 +454,6 @@ tabs["Untitled 1"] = (Button(tabsFrame, text = currentTab))
 tabs["Untitled 1"].configure(command = lambda: edit("Untitled 1"))
 tabs["Untitled 1"].configure(bg = "#FFF")
 tabs["Untitled 1"].pack(side=LEFT)
-tabs["Untitled 1"].bind("<Key>", lambda: status())
 mainFrame = Frame(leftFrame)
 mainFrame.pack(side=TOP, fill=BOTH, expand=YES)
 
@@ -461,6 +466,8 @@ positionLabel.pack(side=RIGHT)
 #initialize a document
 openDocuments["Untitled 1"] = ScrolledText(mainFrame, wrap=WORD)#, height=28, width=80)
 openDocuments["Untitled 1"].pack(fill = BOTH, expand=YES)
+openDocuments["Untitled 1"].bind("<Key>", lambda x: status())
+
 #openDocuments["Untitled 1"].focus_set()
 #setKeyBindings("Untitled 1")
 
