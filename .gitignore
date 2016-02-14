@@ -6,3 +6,6 @@
 
 #backups...
 *.*~
+
+#the default file names that the program creates
+Untitled*
