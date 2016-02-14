@@ -336,10 +336,17 @@ def backspace(var=None):
     lastLen = 1
     status()
 
+def setCursor(line, col):
+    (currentLine, currentCol) = getPosition()
+    newLine = currentLine + line
+    newCol = currentCol + col
+    openDocuments[currentTab].mark_set("insert", "%d.%d" % (newLine, newCol))
+    status()
+
 #this takes the line.col string and returns a nicer representaton
-def getPosition(s):
-    (line,col) = s.split(".")
-    return "(%s:%s)" %(line,col)
+def getPosition():
+    (line,col) = openDocuments[currentTab].index(INSERT).split(".")
+    return (int(line),int(col))
     
 #this will update the program with the current status
 # - line and column number
@@ -350,8 +357,7 @@ def status(saved=False):
     #this does the current position highlighting
     #this should be changed to a) remove all irrelevant tags, and
     #    b) also track the main text window, not just the text entry
-    openDocuments[currentTab].tag_add("all", "1.0", "%s" %END)
-    openDocuments[currentTab].tag_config("all", background="white", foreground="black")
+    openDocuments[currentTab].tag_delete("cursor")
     openDocuments[currentTab].tag_add("cursor", str(INSERT), "%s+1c" %INSERT)
     openDocuments[currentTab].tag_config("cursor", background="black", foreground="white")
 
@@ -363,7 +369,7 @@ def status(saved=False):
 
     #this will tell the user the current line and column number
     #print "%s" %openDocuments[currentTab].END#openDocuments[currentTab].INSERT
-    positionLabel.config(text=getPosition(openDocuments[currentTab].index(INSERT)))
+    positionLabel.config(text="(%d:%d)" %getPosition())
 
 #this does the insertion into the editor window.
 def insert(string):
@@ -428,7 +434,11 @@ textEntry.bind("<BackSpace>", lambda x: backspace())
 textEntry.bind(ctrl+"BackSpace>", lambda x: deleteWord())
 root.bind("<Escape>", lambda x: save())
 textEntry.bind("<Control-Return>", lambda x: quickDefLookupEntry.focus_set())
-textEntry.bind("<Control-space>", lambda x: insert("    ")) #I don't know if this will work
+textEntry.bind("<Control-space>", lambda x: insert("    "))
+textEntry.bind("<Up>",    lambda x: setCursor(-1,0))
+textEntry.bind("<Down>",  lambda x: setCursor(1,0))
+textEntry.bind("<Right>", lambda x: setCursor(0,1))
+textEntry.bind("<Left>",  lambda x: setCursor(0,-1))
 
 #these are the tabs for multiple files
 tabsFrame = Frame(leftFrame, bg = "#3C3B37") #magic value for a tone of gray
