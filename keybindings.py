@@ -6,7 +6,7 @@
 #assignments and formatting everything took FOREVER. Seriously.
 
 
-#some random helpful info copied off a site:
+#some random helpful info copied off a couple sites:
 ''' 
 userInput.bind("<Escape>", lambda(nothing): destroyThis(userDialog))
 userInput.bind("<Return>", functionB)
@@ -46,6 +46,11 @@ Use in format:
 # multiple keystrokes
 self.bind("<Control-Key-%s><Key>" % k,
           lambda event, a=a: self.insert_accented(event.char, a))
+
+
+
+http://www.tcl.tk/man/tcl8.4/TkCmd/keysyms.htm
+might also be useful
 '''
 
 #modifiers
