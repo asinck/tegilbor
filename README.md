@@ -41,7 +41,6 @@ This program uses all sorts of libraries. If one of them is not installed, you c
 
 ###Upcoming enhancements:
 #####File handling 
-* Warn the user if they try to exit the program without saving the file, instead of just warning them to make sure they saved everything.
 * Allow the program to generate timestamps to append to the filename.
 #####Text area:
 * Remember indentation.
