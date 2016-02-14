@@ -158,11 +158,13 @@ def warn():
     #they were edited with the entry box or directly.
     unsavedChanges = False
     for tab in tabs:
-        if [tab].cget("bg") != "#FFF":
+        if tabs[tab].cget("bg") != "#FFF":
             unsavedChanges = True
     if unsavedChanges:
         if tkMessageBox.askokcancel("Save?", "Have you saved everything?"):
             root.destroy()
+    else:
+        root.destroy()
 
 
 #this pops up a window for saving a document with a different name
