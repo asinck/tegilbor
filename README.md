@@ -32,6 +32,7 @@ The [+] at the bottom right is to add a quickdef slot.
 This program uses all sorts of libraries. If one of them is not installed, you can't use the program. If you aren't sure, you can try to run the program, and it will let you know. 
 
 ###Bugs:
+* Middle click pasting doesn't affect the "saved" status.
 * Some keys don't actually work; possibly due either to the OS not allowing it, or the keyboard not being able to handle it.
 * The auto-scroll to cursor may not always work when a binding is looked up.
 * The highlight that indicates where the user is typing might accidentally black out some of the user's text (unconfirmed).
