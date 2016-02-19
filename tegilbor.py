@@ -412,7 +412,7 @@ except:
         icon = PhotoImage(file="icon.gif")
         root.tk.call('wm', 'iconphoto', root._w, icon)
     except:
-        print "Icon not found."
+        print "Note: Unable to set program icon."
 
 leftFrame = Frame(root)
 rightFrame = Frame(root)
