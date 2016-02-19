@@ -122,7 +122,7 @@ def openAFile(fileName):
             tabs[fileName] = tabs[currentTab]
             del tabs[currentTab]
             #put the file in the document area
-            openDocuments[fileName] = ScrolledText(mainFrame, wrap=WORD)
+            openDocuments[fileName] = ScrolledText(mainFrame, wrap=WORD, bg="#004", fg="#FFF")
             #Text(mainFrame, height=28, width=80)
             edit(fileName, True)
             openDocuments[fileName].insert(END, s)
@@ -134,7 +134,7 @@ def openAFile(fileName):
             tabs[fileName].configure(command = lambda: edit(fileName))
             tabs[fileName].pack(side=LEFT)
             #put the file in the document area
-            openDocuments[fileName] = ScrolledText(mainFrame, wrap=WORD)
+            openDocuments[fileName] = ScrolledText(mainFrame, wrap=WORD, bg="#004", fg="#FFF")
             #Text(mainFrame, height=28, width=80)
             edit(fileName)
             openDocuments[fileName].insert(END, s)
@@ -219,7 +219,7 @@ def newDoc(var=None):
     tabs[s].pack(side=LEFT)
     
     #make the document
-    openDocuments[s] = ScrolledText(mainFrame, wrap=WORD)#, height=28, width=80)
+    openDocuments[s] = ScrolledText(mainFrame, wrap=WORD, bg="#004", fg="#FFF")#, height=28, width=80)
     
     edit(s)
     currentTab = s
@@ -344,15 +344,22 @@ def backspace(var=None):
 def functionCheck(var=None):
     print "Function call is working. Value is", var
 
+#this checks to see if the given document is saved
+def isSaved(docName):
+    return openDocuments[docName].cget("bg") == "#FFF"
+    
 #this moves the cursor around
 def setCursor(line, col):
     (currentLine, currentCol) = getPosition()
     newLine = currentLine + line
     newCol = currentCol + col
     openDocuments[currentTab].mark_set("insert", "%d.%d" % (newLine, newCol))
-    status()
+    #tabs[tab].cget("bg") == "#FFF"
+    status() #status(True) might work, but needs to reflect if the
+             #document is actually saved or not
 
-#this takes the line.col string and returns a nicer representaton
+#this takes the line.col string and returns a (line, col)
+#representation
 def getPosition():
     (line,col) = openDocuments[currentTab].index(INSERT).split(".")
     return (int(line),int(col))
@@ -368,7 +375,7 @@ def status(saved=False):
     #    b) also track the main text window, not just the text entry
     openDocuments[currentTab].tag_delete("cursor")
     openDocuments[currentTab].tag_add("cursor", str(INSERT), "%s.%s+1c" %getPosition())
-    openDocuments[currentTab].tag_config("cursor", background="black", foreground="white")
+    openDocuments[currentTab].tag_config("cursor", background="white", foreground="#003")
 
     #this will give the user an indication of if the file is saved or not
     if (not saved):
@@ -396,12 +403,16 @@ def insert(string):
 
 #top level stuff
 root = Tk()
-root.title("Text Editor")
+root.title("Tegilbor Speed Text Editor")
 try:
-    icon = PhotoImage(file="te.png")
+    icon = PhotoImage(file="icon.png")
     root.tk.call('wm', 'iconphoto', root._w, icon)
 except:
-    print "Icon not found."
+    try:
+        icon = PhotoImage(file="icon.gif")
+        root.tk.call('wm', 'iconphoto', root._w, icon)
+    except:
+        print "Icon not found."
 
 leftFrame = Frame(root)
 rightFrame = Frame(root)
@@ -444,6 +455,7 @@ textEntry.bind(ctrl+"BackSpace>", lambda x: deleteWord())
 root.bind("<Escape>", lambda x: save())
 textEntry.bind("<Control-Return>", lambda x: quickDefLookupEntry.focus_set())
 textEntry.bind("<Control-space>", lambda x: insert("    "))
+#I should also bind a click in the text area to setCursor or something
 textEntry.bind("<Up>",    lambda x: setCursor(-1,0))
 textEntry.bind("<Down>",  lambda x: setCursor(1,0))
 textEntry.bind("<Right>", lambda x: setCursor(0,1))
@@ -467,7 +479,8 @@ statusBar.pack(side=BOTTOM, fill="x")
 positionLabel.pack(side=RIGHT)
 
 #initialize a document
-openDocuments["Untitled 1"] = ScrolledText(mainFrame, wrap=WORD)#, height=28, width=80)
+#this might be better with a call to edit() or something
+openDocuments["Untitled 1"] = ScrolledText(mainFrame, wrap=WORD, bg="#003", fg="#FFF")#, height=28, width=80)
 openDocuments["Untitled 1"].pack(fill = BOTH, expand=YES)
 openDocuments["Untitled 1"].bind("<Key>", lambda x: status())
 
