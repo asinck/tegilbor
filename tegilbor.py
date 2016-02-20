@@ -40,7 +40,7 @@ if len(failedPackages) > 0:
 currentTab = "Untitled 1" #this is the name of the initial tab
 openDocuments = {}        #a hash table of documents
 tabs = {}                 #a hash table of the tabs that will allow the
-unnamedDocs = 1           #user to have multiple tabs open at once
+unnamedDocs = 0           #user to have multiple tabs open at once
 quickDefs = {}
 
 
@@ -465,10 +465,6 @@ textEntry.bind("<Left>",  lambda x: setCursor(0,-1))
 tabsFrame = Frame(leftFrame, bg = "#3C3B37") #magic value for a tone of gray
 tabsFrame.pack(side=TOP, fill=BOTH)
 
-tabs["Untitled 1"] = (Button(tabsFrame, text = currentTab))
-tabs["Untitled 1"].configure(command = lambda: edit("Untitled 1"))
-tabs["Untitled 1"].configure(bg = "#FFF")
-tabs["Untitled 1"].pack(side=LEFT)
 mainFrame = Frame(leftFrame)
 mainFrame.pack(side=TOP, fill=BOTH, expand=YES)
 
@@ -479,14 +475,7 @@ statusBar.pack(side=BOTTOM, fill="x")
 positionLabel.pack(side=RIGHT)
 
 #initialize a document
-#this might be better with a call to edit() or something
-openDocuments["Untitled 1"] = ScrolledText(mainFrame, wrap=WORD, bg="#003", fg="#FFF")#, height=28, width=80)
-openDocuments["Untitled 1"].pack(fill = BOTH, expand=YES)
-openDocuments["Untitled 1"].bind("<Key>", lambda x: status())
-
-#openDocuments["Untitled 1"].focus_set()
-#setKeyBindings("Untitled 1")
-
+newDoc()
 
 #stuff on the right
 
