@@ -494,7 +494,7 @@ quickDefLookupEntry.pack(side=TOP)
 lookupLabel.pack(side=TOP)
 
 quickDefLabel.pack()
-#makeQuickDef(rightFrame)
+
 addQuickDef.pack(side=BOTTOM)
 
 textEntry.focus_set()
