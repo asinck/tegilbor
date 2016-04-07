@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 #Adam Sinck
 
 #This was originally a text editor I wrote for fun, and to see if I
@@ -42,7 +43,7 @@ openDocuments = {}        #a hash table of documents
 tabs = {}                 #a hash table of the tabs that will allow the
 unnamedDocs = 0           #user to have multiple tabs open at once
 quickDefs = {}
-
+lastLen = 1
 
 #functions
 
@@ -224,67 +225,34 @@ def newDoc(var=None):
     edit(s)
     currentTab = s
     tabs[currentTab].configure(bg = "#FFF")
-    
-
-#this makes a new quick def
-def makeQuickDef(frame):
-    myFrame = Frame(frame)
-    left = Frame(myFrame)
-    right = Frame(myFrame)
-
-    #in left
-    myLeftFrame = Frame(left)
-    myRightFrame = Frame(left)
-    
-    keyLabel = Label(myLeftFrame, text = "Key")
-    keyEntry = Entry(myLeftFrame, width = 2)
-    keyEntry.bind("<Return>", lambda x: quickDef(keyEntry.get(), wordEntry.get()))
-    colon = Label(left, text = "\n:")
-    wordLabel = Label(myRightFrame, text = "Word")
-    wordEntry = Entry(myRightFrame, width = 7)
-    wordEntry.bind("<Return>", lambda x: quickDef(keyEntry.get(), wordEntry.get()))
-
-    #in right
-    def close():
-        myFrame.pack_forget()
-        deleteQuickDef(keyEntry.get())
-    
-    closeButton = Button(right, text = "[X]", command = lambda: close())
-    addButton = Button(right, text = "[+]", command = lambda: quickDef(keyEntry.get(), wordEntry.get()))
-
-    #pack
-    myFrame.pack()
-    left.pack(side=LEFT)
-    right.pack(side=RIGHT)
-
-    myLeftFrame.pack(side=LEFT)
-    colon.pack(side=LEFT)
-    myRightFrame.pack(side=LEFT)
-
-    keyLabel.pack(side=TOP)
-    keyEntry.pack(side=BOTTOM)
-    wordLabel.pack(side=TOP)
-    wordEntry.pack(side=BOTTOM)
-
-    closeButton.pack(side=TOP)
-    addButton.pack(side=BOTTOM)
-
-    addQuickDef.pack_forget()
-    addQuickDef.pack(side=BOTTOM)
-    
-    keyEntry.focus_set()
 
 #this defines a new quickdef, or redefines an existing quickdef
 def quickDef(key, word):
-    quickDefs[key] = word
+    if key not in quickDefs:
+        currentText = activeQuickDefsLabel.cget("text")
+        newText = currentText + "\n%s: %s\n" %(key, word)
+        newText = '\n'.join(sorted(newText.split("\n"))).strip()
+        activeQuickDefsLabel.config(text = newText);
+        quickDefs[key] = word
+    else:
+        if (quickDefs[key] != word):
+            deleteQuickDef(key)
+            quickDef(key, word) #I'm lazy
     textEntry.focus_set()
 
 #this deletes a quickdef, if possible
 def deleteQuickDef(key):
     try:
+        #find out what the word is, so the label can be deleted
+        word = quickDefs[key]
+        currentText = activeQuickDefsLabel.cget("text")
+        newText = currentText.replace("%s: %s\n" %(key, word), "")
+        activeQuickDefsLabel.config(text = newText);
+        
         del quickDefs[key]
+        
     except:
-        print key + " not found."
+        messagesLabel.config(text = "Key not found.")
 
 #this does the auto-replace of quickdefs
 def findQuickDef(key):
@@ -294,15 +262,15 @@ def findQuickDef(key):
         openDocuments[currentTab].delete("%s-2c" % INSERT, INSERT)
         insert(word)
     except:
-        print "Key not found."
+        messagesLabel.config(text = "Key not found.")
 
 #this lets the user look up a binding
 def lookup():
     global currentTab
     #get the string that the user wants to look up, clear the entry
     #box, and refocus the text entry box
-    string = quickDefLookupEntry.get()
-    quickDefLookupEntry.delete(0, 'end')
+    string = bindingLookupEntry.get()
+    bindingLookupEntry.delete(0, 'end')
     textEntry.focus_set()
 
     #go through all the bindings, searching for the ones that have the
@@ -314,7 +282,7 @@ def lookup():
                 s = key + " " + bindings[key]
                 results.append(s)
         results = sorted(results, key=len)
-    lookupLabel.config(text='\n'.join(results))
+    bindingLookupLabel.config(text='\n'.join(results))
     #this might be an issue...if this focuses on the end, instead of
     #the current cursor position
     openDocuments[currentTab].see("end")
@@ -390,6 +358,7 @@ def status(saved=False):
 #this does the insertion into the editor window.
 def insert(string):
     global lastLen, currentTab
+    messagesLabel.config(text = "")
     lastLen = len(string)
     openDocuments[currentTab].insert(INSERT, string)
     if (openDocuments[currentTab].get("%s-2c" % INSERT, "%s-1c" % INSERT) == '?') and \
@@ -412,7 +381,7 @@ except:
         icon = PhotoImage(file="icon.gif")
         root.tk.call('wm', 'iconphoto', root._w, icon)
     except:
-        print "Note: Unable to set program icon."
+        messagesLabel.config(text = "Note: Unable to set program icon.")
 
 leftFrame = Frame(root)
 rightFrame = Frame(root)
@@ -453,7 +422,7 @@ for keystroke in letters:
 textEntry.bind("<BackSpace>", lambda x: backspace())
 textEntry.bind(ctrl+"BackSpace>", lambda x: deleteWord())
 root.bind("<Escape>", lambda x: save())
-textEntry.bind("<Control-Return>", lambda x: quickDefLookupEntry.focus_set())
+textEntry.bind("<Control-Return>", lambda x: bindingLookupEntry.focus_set())
 textEntry.bind("<Control-space>", lambda x: insert("    "))
 #I should also bind a click in the text area to setCursor or something
 textEntry.bind("<Up>",    lambda x: setCursor(-1,0))
@@ -470,32 +439,71 @@ mainFrame.pack(side=TOP, fill=BOTH, expand=YES)
 
 statusBar = Frame(leftFrame)
 positionLabel = Label(statusBar, text = "(1:0)")
+messagesLabel = Label(statusBar, text = "")
 
 statusBar.pack(side=BOTTOM, fill="x")
 positionLabel.pack(side=RIGHT)
-
+messagesLabel.pack(side=LEFT)
 #initialize a document
 newDoc()
 
 #stuff on the right
+#the lookup area
+bindingLookupFrame = Frame(rightFrame)
+bindingLookupEntry = Entry(bindingLookupFrame, width = 5)
+bindingLookupEntry.bind("<Return>", lambda x: lookup())
+bindingLookupEntry.bind("<Control-Return>", lambda x: lookup())
+bindingLookupLabel = Label(bindingLookupFrame, text = "")
 
-lookupFrame = Frame(rightFrame)
-quickDefLookupEntry = Entry(lookupFrame, width = 5)
-quickDefLookupEntry.bind("<Return>", lambda x: lookup())
-lookupLabel = Label(lookupFrame, text = "")
+bindingLookupFrame.pack(side=TOP)
+bindingLookupEntry.pack(side=TOP)
+bindingLookupLabel.pack(side=TOP)
 
-quickDefLabel = Label(rightFrame, text = "quickdefs", bg="gray")
-addQuickDef = Button(rightFrame, text = "[+]", command = lambda: makeQuickDef(rightFrame))
+#the quick defs area
+#hold the quick def stuff
+quickDefFrame = Frame(rightFrame)
+#the label telling the user what this area is
+quickDefLabel = Label(quickDefFrame, text = "quickdefs", bg="gray")
 
-quickDefLookupEntry.bind("<Control-Return>", lambda x: lookup())
+quickDefFrame.pack(side=TOP)
+quickDefLabel.pack(side=TOP, expand = YES, fill = "x")
 
-lookupFrame.pack(side=TOP)
-quickDefLookupEntry.pack(side=TOP)
-lookupLabel.pack(side=TOP)
+#a list of active quick defs
+activeQuickDefsLabel = Label(quickDefFrame, text = "")
 
-quickDefLabel.pack()
+#allow the user to add quick defs
+newQuickDefFrame = Frame(quickDefFrame)
+newQuickDefLeftFrame = Frame(newQuickDefFrame)
+newQuickDefRightFrame = Frame(newQuickDefFrame)
+newQuickDefButtonFrame = Frame(newQuickDefFrame)
 
-addQuickDef.pack(side=BOTTOM)
+newQuickDefKeyLabel = Label(newQuickDefLeftFrame, text = "Key")
+newQuickDefKeyEntry = Entry(newQuickDefLeftFrame, width = 2)
+newQuickDefKeyEntry.bind("<Return>", lambda x: quickDef(newQuickDefKeyEntry.get(), newQuickDefWordEntry.get()))
+newQuickDefColon = Label(newQuickDefFrame, text = "\n:")
+newQuickDefWordLabel = Label(newQuickDefRightFrame, text = "Word")
+newQuickDefWordEntry = Entry(newQuickDefRightFrame, width = 7)
+newQuickDefWordEntry.bind("<Return>", lambda x: quickDef(newQuickDefKeyEntry.get(), newQuickDefWordEntry.get()))
+newQuickDefCloseButton = Button(newQuickDefButtonFrame, text = "[X]", command = lambda: deleteQuickDef(newQuickDefKeyEntry.get()))
+newQuickDefAddButton = Button(newQuickDefButtonFrame, text = "[+]", command = lambda: quickDef(newQuickDefKeyEntry.get(), newQuickDefWordEntry.get()))
+
+#pack all the stuff for the quick defs
+newQuickDefFrame.pack(side=TOP)
+newQuickDefLeftFrame.pack(side=LEFT)
+newQuickDefButtonFrame.pack(side=RIGHT)
+newQuickDefRightFrame.pack(side=RIGHT)
+
+newQuickDefFrame.pack(side=TOP)
+newQuickDefKeyLabel.pack(side=TOP)
+newQuickDefKeyEntry.pack(side=BOTTOM)
+newQuickDefColon.pack()
+newQuickDefWordLabel.pack(side=TOP)
+newQuickDefWordEntry.pack(side=BOTTOM)
+
+newQuickDefAddButton.pack(side=TOP)
+newQuickDefCloseButton.pack(side=BOTTOM)
+
+activeQuickDefsLabel.pack(side=TOP)
 
 textEntry.focus_set()
 
