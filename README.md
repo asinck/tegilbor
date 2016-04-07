@@ -45,19 +45,23 @@ This program uses all sorts of libraries. If one of them is not installed, you c
 #####File handling 
 * Allow the program to generate timestamps to append to the filename.
 * Get a better file open or save dialog.
+
 #####Text area:
 * Remember indentation.
 * Line numbers.
 * Let ctrl-backspace delete a string of whitespace.
+
 #####Quickdefs:
 * Automatically generated quickdefs.
 * Make it clearer what buttons go to which quickdef, when there are a lot of quickdefs defined.
 * Let the quickdef section scroll if needed.
+
 #####Other:
 * Allow the user to close tabs.
 * Fix the readme to not switch between first, third, and second person.
 * Allow typing of any character in the text entry box.
 * Rewrite the whole program to clean up the code.
+
 ###Notes:
 
 The bindings for the keys may change occasionally, as I see fit. 
