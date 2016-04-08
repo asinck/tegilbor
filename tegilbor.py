@@ -248,7 +248,6 @@ def deleteQuickDef():
         index = activeQuickDefsBox.curselection()
         entry = activeQuickDefsBox.get(index)
         key = entry.split(":")[0]
-        print key
         del quickDefs[key]
         refreshQuickDefBox()
     except:
