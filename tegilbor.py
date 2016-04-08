@@ -226,33 +226,35 @@ def newDoc(var=None):
     currentTab = s
     tabs[currentTab].configure(bg = "#FFF")
 
+def refreshQuickDefBox():
+    activeQuickDefsBox.delete(0,END)
+    for i in sorted(quickDefs):
+        word = "%s: %s" %(i, quickDefs[i])
+        activeQuickDefsBox.insert(END,word)
+
 #this defines a new quickdef, or redefines an existing quickdef
 def quickDef(key, word):
-    if key not in quickDefs:
-        currentText = activeQuickDefsLabel.cget("text")
-        newText = currentText + "\n%s: %s\n" %(key, word)
-        newText = '\n'.join(sorted(newText.split("\n"))).strip()
-        activeQuickDefsLabel.config(text = newText);
+    if (key != ""):
         quickDefs[key] = word
-    else:
-        if (quickDefs[key] != word):
-            deleteQuickDef(key)
-            quickDef(key, word) #I'm lazy
+        refreshQuickDefBox()
+        newQuickDefKeyEntry.delete(0, END)
+        newQuickDefWordEntry.delete(0, END)
     textEntry.focus_set()
 
+
 #this deletes a quickdef, if possible
-def deleteQuickDef(key):
+def deleteQuickDef():
     try:
-        #find out what the word is, so the label can be deleted
-        word = quickDefs[key]
-        currentText = activeQuickDefsLabel.cget("text")
-        newText = currentText.replace("%s: %s\n" %(key, word), "")
-        activeQuickDefsLabel.config(text = newText);
-        
+        index = activeQuickDefsBox.curselection()
+        entry = activeQuickDefsBox.get(index)
+        key = entry.split(":")[0]
+        print key
         del quickDefs[key]
-        
+        refreshQuickDefBox()
     except:
-        messagesLabel.config(text = "Key not found.")
+        messagesLabel.config(text = "No selection.")
+        
+    textEntry.focus_set()
 
 #this does the auto-replace of quickdefs
 def findQuickDef(key):
@@ -469,7 +471,8 @@ quickDefFrame.pack(side=TOP)
 quickDefLabel.pack(side=TOP, expand = YES, fill = "x")
 
 #a list of active quick defs
-activeQuickDefsLabel = Label(quickDefFrame, text = "")
+#activeQuickDefsLabel = Label(quickDefFrame, text = "", bg="white")
+activeQuickDefsBox = Listbox(quickDefFrame)
 
 #allow the user to add quick defs
 newQuickDefFrame = Frame(quickDefFrame)
@@ -484,13 +487,12 @@ newQuickDefColon = Label(newQuickDefFrame, text = "\n:")
 newQuickDefWordLabel = Label(newQuickDefRightFrame, text = "Word")
 newQuickDefWordEntry = Entry(newQuickDefRightFrame, width = 7)
 newQuickDefWordEntry.bind("<Return>", lambda x: quickDef(newQuickDefKeyEntry.get(), newQuickDefWordEntry.get()))
-newQuickDefCloseButton = Button(newQuickDefButtonFrame, text = "[X]", command = lambda: deleteQuickDef(newQuickDefKeyEntry.get()))
 newQuickDefAddButton = Button(newQuickDefButtonFrame, text = "[+]", command = lambda: quickDef(newQuickDefKeyEntry.get(), newQuickDefWordEntry.get()))
 
 #pack all the stuff for the quick defs
 newQuickDefFrame.pack(side=TOP)
 newQuickDefLeftFrame.pack(side=LEFT)
-newQuickDefButtonFrame.pack(side=RIGHT)
+newQuickDefButtonFrame.pack(side=RIGHT, fill="y")
 newQuickDefRightFrame.pack(side=RIGHT)
 
 newQuickDefFrame.pack(side=TOP)
@@ -500,11 +502,13 @@ newQuickDefColon.pack()
 newQuickDefWordLabel.pack(side=TOP)
 newQuickDefWordEntry.pack(side=BOTTOM)
 
-newQuickDefAddButton.pack(side=TOP)
-newQuickDefCloseButton.pack(side=BOTTOM)
+newQuickDefAddButton.pack(side=RIGHT, fill="y")
 
-activeQuickDefsLabel.pack(side=TOP)
 
+quickDefRemoveButton = Button(quickDefFrame, text = "[X]", command = lambda: deleteQuickDef())
+activeQuickDefsBox.pack(side=TOP, expand=YES, fill="x")
+#activeQuickDefsLabel.pack(side=TOP, expand=YES, fill="x")
+quickDefRemoveButton.pack(side=BOTTOM)
 textEntry.focus_set()
 
 #set an action to happen when the window is closed
