@@ -425,6 +425,7 @@ textEntry.bind(ctrl+"BackSpace>", lambda x: deleteWord())
 root.bind("<Escape>", lambda x: save())
 textEntry.bind("<Control-Return>", lambda x: bindingLookupEntry.focus_set())
 textEntry.bind("<Control-space>", lambda x: insert("    "))
+textEntry.bind("<Shift-Return>", lambda x: newQuickDefKeyEntry.focus_set())
 #I should also bind a click in the text area to setCursor or something
 textEntry.bind("<Up>",    lambda x: setCursor(-1,0))
 textEntry.bind("<Down>",  lambda x: setCursor(1,0))
@@ -470,8 +471,11 @@ quickDefFrame.pack(side=TOP)
 quickDefLabel.pack(side=TOP, expand = YES, fill = "x")
 
 #a list of active quick defs
+activeQuickDefFrame = Frame(quickDefFrame, bg="white")
 #activeQuickDefsLabel = Label(quickDefFrame, text = "", bg="white")
-activeQuickDefsBox = Listbox(quickDefFrame)
+activeQuickDefsScrollbar = Scrollbar(activeQuickDefFrame, orient=VERTICAL)
+activeQuickDefsBox = Listbox(activeQuickDefFrame, yscrollcommand=activeQuickDefsScrollbar.set)
+activeQuickDefsScrollbar.config(command=activeQuickDefsBox.yview)
 
 #allow the user to add quick defs
 newQuickDefFrame = Frame(quickDefFrame)
@@ -505,7 +509,10 @@ newQuickDefAddButton.pack(side=RIGHT, fill="y")
 
 
 quickDefRemoveButton = Button(quickDefFrame, text = "[X]", command = lambda: deleteQuickDef())
-activeQuickDefsBox.pack(side=TOP, expand=YES, fill="x")
+
+activeQuickDefFrame.pack(expand=YES)
+activeQuickDefsScrollbar.pack(side=RIGHT, expand=YES, fill="y")
+activeQuickDefsBox.pack(side=LEFT, expand=YES, fill="y")
 #activeQuickDefsLabel.pack(side=TOP, expand=YES, fill="x")
 quickDefRemoveButton.pack(side=BOTTOM)
 textEntry.focus_set()
