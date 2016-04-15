@@ -182,6 +182,7 @@ def saveAsThis(fileName):
         return
     try:
         text = open(fileName, 'r')
+        text.close()
         message = "This file already exists. Save anyway?"
         answer = tkMessageBox.askyesno("Error", message)
         if not answer:
@@ -228,7 +229,7 @@ def newDoc(var=None):
 
 def refreshQuickDefBox():
     activeQuickDefsBox.delete(0,END)
-    for i in sorted(quickDefs):
+    for i in sorted(quickDefs, key=str.lower):
         word = "%s: %s" %(i, quickDefs[i])
         activeQuickDefsBox.insert(END,word)
 
@@ -265,13 +266,48 @@ def findQuickDef(key):
     except:
         messagesLabel.config(text = "Key not found.")
 
+#pop up a dialog to ask for the export file name
+def exportQuickdefs():
+    popup("Export Quickdefs:", "What is the file name?", "Export", "Cancel", exportQuickdefsList)
+
+#export the quickdefs
+def exportQuickdefsList(filename):
+    try:
+        text = open(filename, 'r')
+        text.close()
+        message = "This file already exists. Save anyway?"
+        answer = tkMessageBox.askyesno("Error", message)
+        if not answer:
+            return
+    except:
+        pass
+    text = open(filename, 'w+')
+    exportList = '\n'.join(list(activeQuickDefsBox.get(0,END)))
+    text.write(exportList)
+    text.close()
+
+#pop up a dialog to ask for the import file name
+def importQuickdefs():
+    popup("Import Quickdefs:", "What is the file name?", "Import", "Cancel", importQuickdefsList)
+
+#import the quickdefs
+def importQuickdefsList(filename):
+    try:
+        text = open(filename, 'r')
+        for line in text:
+            split = line.split(": ")
+            key, word = split[0], split[1].strip()
+            quickDef(key, word)
+    except:
+        tkMessageBox.showerror("Error", "File could not be opened.")
+    
 #this lets the user look up a binding
 def lookup():
     global currentTab
     #get the string that the user wants to look up, clear the entry
     #box, and refocus the text entry box
     string = bindingLookupEntry.get()
-    bindingLookupEntry.delete(0, 'end')
+    bindingLookupEntry.delete(0, END)
     textEntry.focus_set()
 
     #go through all the bindings, searching for the ones that have the
@@ -507,14 +543,20 @@ newQuickDefWordEntry.pack(side=BOTTOM)
 
 newQuickDefAddButton.pack(side=RIGHT, fill="y")
 
+quickDefEditFrame = Frame(quickDefFrame)
 
-quickDefRemoveButton = Button(quickDefFrame, text = "[X]", command = lambda: deleteQuickDef())
+quickDefRemoveButton = Button(quickDefEditFrame, text = "[X]", command = lambda: deleteQuickDef())
+quickDefExportButton = Button(quickDefEditFrame, text = "Export", command = lambda: exportQuickdefs())
+quickDefImportButton = Button(quickDefEditFrame, text = "Import", command = lambda: importQuickdefs())
 
 activeQuickDefFrame.pack(expand=YES)
 activeQuickDefsScrollbar.pack(side=RIGHT, expand=YES, fill="y")
 activeQuickDefsBox.pack(side=LEFT, expand=YES, fill="y")
 #activeQuickDefsLabel.pack(side=TOP, expand=YES, fill="x")
-quickDefRemoveButton.pack(side=BOTTOM)
+quickDefEditFrame.pack(side=BOTTOM)
+quickDefRemoveButton.pack(side=LEFT)
+quickDefImportButton.pack(side=LEFT)
+quickDefExportButton.pack(side=LEFT)
 textEntry.focus_set()
 
 #set an action to happen when the window is closed
