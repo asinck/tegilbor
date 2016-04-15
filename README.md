@@ -35,6 +35,7 @@ This program uses the Tkinter GUI library. If it is not installed, you can't use
 * The auto-scroll to cursor may not always work when a binding is looked up.
 * The length sorting for the lookup does not work properly.
 * The line/col indication is not correct (except by coincidence) if the user clicks in the text field.
+* The amount of text backspace deletes can be incorrect if the user moves the cursor and expects a single letter to be deleted when they hit backspace.
 
 ###Upcoming enhancements:
 #####File handling 
