@@ -20,7 +20,7 @@ On the right is a sidebar. This sidebar contains both a lookup field and a quick
 ####QuickDefs:
 These allow the user to define a expansion string for a letter. To activate expansion, the user types a question mark followed by the letter. For example, if the user knows that they're going to type "github" a lot, they can define g as "github", and when they're typing, if they type "?g" it will be replaced with "github".
 
-Quickdefs can be defined as pretty much anything, so they can used for work fragments, whole words, phrases, paragraphs, etc.
+Quickdefs can be defined as pretty much anything, so they can used for word fragments, whole words, phrases, paragraphs, etc.
 
 To add a quickdef (for the current session only), enter the letter and word that the letter stands for, and either hit enter or click the little [+] next to the entry. The quickdefs can also be imported/exported with the buttons under the list, for saving them between sessions. To remove a quickdef, select it from the list and click the [X] under the list.
 
