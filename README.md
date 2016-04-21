@@ -40,12 +40,10 @@ This program uses the Tkinter GUI library. If it is not installed, you can't use
 ###Upcoming enhancements:
 #####File handling 
 * Allow the program to generate timestamps to append to the filename.
-* Get a better file open or save dialog (also import/export dialog).
 
 #####Text area:
 * Remember indentation.
 * Line numbers.
-* Let ctrl-backspace delete a string of whitespace.
 
 #####Quickdefs:
 * Automatically generated quickdefs.
