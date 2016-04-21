@@ -15,9 +15,8 @@ imports = [
     "import tkMessageBox",
     "from ScrolledText import ScrolledText",
     "from keybindings import *",
-    # "import hashlib",
-    # "import time",
-    # "import random"
+    "import tkFileDialog as tkf",
+    "import string"
 ]
 #failedPackages will keep a record of the names of the packages that
 #failed to import, so that the program can go through the entire list
@@ -39,6 +38,7 @@ if len(failedPackages) > 0:
 
 #global variables
 currentTab = "Untitled 1" #this is the name of the initial tab
+currentTabShortName = currentTab.split("/")[-1]
 openDocuments = {}        #a hash table of documents
 tabs = {}                 #a hash table of the tabs that will allow the
 unnamedDocs = 0           #user to have multiple tabs open at once
@@ -50,6 +50,11 @@ lastLen = 1
 #notDone will give a message saying that that feature is not complete
 def notDone(var=None):
     tkMessageBox.showinfo("Not Ready", "This feature is not complete yet.")
+
+#this checks to make sure a function call is working
+#this is only used for debugging purposes
+def functionCheck(var=None):
+    print "Function call is working. Value is", var
 
 #this will pop up a dialog box for user input
 def popup(title, message, proceed, cancel, command, inputWidth=30):
@@ -88,22 +93,26 @@ def currentTabIsUnedited():
 
 #this is used for switching tabs
 def edit(tabName, sameTab=False):
-    global currentTab
+    global currentTab, currentTabShortName
     openDocuments[currentTab].pack_forget()
     currentTab = tabName
     openDocuments[currentTab].pack(fill = BOTH, expand=YES)
-    root.title(currentTab + " - Tegilbor Speed Text Editor")
+    root.title(currentTabShortName + " - Tegilbor Speed Text Editor")
     openDocuments[currentTab].bind("<Key>", lambda x: status())
 
 #make a new document
 def openFile():
-    popup("Open File", "What is the file name?", "Open", "Cancel", openAFile)
-
+    fileName = tkf.askopenfilename()
+    if (fileName != ""):
+        openAFile(fileName)
+    
 #this opens a file and allows the user to edit it
 def openAFile(fileName):
+    global currentTab, currentTabShortName
     if fileName in tabs:
         tkMessageBox.showerror("Error", "This file is already open.")
         return
+    currentTabShortName = fileName.split("/")[-1]
     try:
         text = open(fileName)
         s = ''
@@ -113,7 +122,7 @@ def openAFile(fileName):
         if currentTabIsUnedited():
             #edit the current tab
             #change the display name of the current tab
-            tabs[currentTab].configure(text = fileName)
+            tabs[currentTab].configure(text = currentTabShortName)
             #make the command of the current tab be to edit the
             #document with the filename
             tabs[currentTab].configure(command = lambda: edit(fileName))
@@ -128,10 +137,10 @@ def openAFile(fileName):
             edit(fileName, True)
             openDocuments[fileName].insert(END, s)
             tabs[fileName].configure(bg = "#FFF")
-            
+            currentTab = fileName
         else:
             #make a new tab
-            tabs[fileName] = (Button(tabsFrame, text = fileName))
+            tabs[fileName] = (Button(tabsFrame, text = currentTabShortName))
             tabs[fileName].configure(command = lambda: edit(fileName))
             tabs[fileName].pack(side=LEFT)
             #put the file in the document area
@@ -140,6 +149,7 @@ def openAFile(fileName):
             edit(fileName)
             openDocuments[fileName].insert(END, s)
             tabs[fileName].configure(bg = "#FFF")
+            currentTab = fileName
         
     except:
         s = 'The file "' + fileName + '" cannot be opened.'
@@ -167,35 +177,26 @@ def warn():
     else:
         root.destroy()
 
-
-#this pops up a window for saving a document with a different name
+#this pops up a save-as dialog window
 def saveAs(var=None):
-    popup("Save As", "What is the new file name?", "Save", "Cancel", saveAsThis)
+    fileName = tkf.asksaveasfilename()
+    if (fileName != ""):
+        saveAsThis(fileName)
 
 #this does the saving part of the save as
 def saveAsThis(fileName):
-    global currentTab, unnamedDocs
-    #get the file name to save as; if it exists make sure that the user
-    #meant to save the file with that name
-    if (fileName == ""):
-        tkMessageBox.showerror("Error", "Invalid file name.")
-        return
-    try:
-        text = open(fileName, 'r')
-        text.close()
-        message = "This file already exists. Save anyway?"
-        answer = tkMessageBox.askyesno("Error", message)
-        if not answer:
-            return
-    except:
-        pass
+    global currentTab, currentTabShortName, unnamedDocs
+    if (fileName in tabs):
+        tabs[fileName].pack_forget()
+        del tabs[fileName]
+        del openDocuments[fileName]
     if currentTab[0:8] == "Untitled":
         unnamedDocs -= 1
-    
+    currentTabShortName = fileName.split("/")[-1]
     #rename the current tab and make sure that it points at the right file
     tabs[fileName] = tabs[currentTab]
     del tabs[currentTab]
-    tabs[fileName].configure(text = fileName)
+    tabs[fileName].configure(text = currentTabShortName)
     tabs[fileName].configure(command = lambda: edit(fileName))
     #rename the current document's key
     openDocuments[fileName] = openDocuments[currentTab]
@@ -206,7 +207,7 @@ def saveAsThis(fileName):
     text = open(fileName, 'w+')
     contents = openDocuments[fileName].get(1.0, END)
     text.write(contents)
-    root.title(currentTab + " - Tegilbor Speed Text Editor")
+    root.title(currentTabShortName + " - Tegilbor Speed Text Editor")
     tabs[currentTab].configure(bg = "#FFF")
 
 #this opens a new document
@@ -226,7 +227,8 @@ def newDoc(var=None):
     edit(s)
     currentTab = s
     tabs[currentTab].configure(bg = "#FFF")
-
+    currentTabShortName = currentTab
+    
 def refreshQuickDefBox():
     activeQuickDefsBox.delete(0,END)
     for i in sorted(quickDefs, key=str.lower):
@@ -268,19 +270,12 @@ def findQuickDef(key):
 
 #pop up a dialog to ask for the export file name
 def exportQuickdefs():
-    popup("Export Quickdefs:", "What is the file name?", "Export", "Cancel", exportQuickdefsList)
+    fileName = tkf.asksaveasfilename()
+    if (fileName != ""):
+        exportQuickdefsList(fileName)
 
 #export the quickdefs
 def exportQuickdefsList(filename):
-    try:
-        text = open(filename, 'r')
-        text.close()
-        message = "This file already exists. Save anyway?"
-        answer = tkMessageBox.askyesno("Error", message)
-        if not answer:
-            return
-    except:
-        pass
     text = open(filename, 'w+')
     exportList = '\n'.join(list(activeQuickDefsBox.get(0,END)))
     text.write(exportList)
@@ -288,7 +283,9 @@ def exportQuickdefsList(filename):
 
 #pop up a dialog to ask for the import file name
 def importQuickdefs():
-    popup("Import Quickdefs:", "What is the file name?", "Import", "Cancel", importQuickdefsList)
+    fileName = tkf.askopenfilename()
+    if (fileName != ""):
+        importQuickdefsList(fileName)
 
 #import the quickdefs
 def importQuickdefsList(filename):
@@ -324,14 +321,49 @@ def lookup():
     #the current cursor position
     openDocuments[currentTab].see("end")
     
+# #this is a ctrl-backspace (delete previous word)
+# def deleteWord(var=None):
+#     global lastLen, currentTab
+#     lastLen = 1
+#     char = '-'
+#     while char not in " _\n.,":
+#         openDocuments[currentTab].delete("%s-1c" % INSERT, INSERT)
+#         char = openDocuments[currentTab].get("%s-1c" % INSERT, INSERT)
+#     status()
+
 #this is a ctrl-backspace (delete previous word)
 def deleteWord(var=None):
     global lastLen, currentTab
+    #find out what the first character to be deleted is
+    firstChar = openDocuments[currentTab].get("%s-1c" % INSERT, INSERT)
+    #delete the last character
+    openDocuments[currentTab].delete("%s-1c" % INSERT, INSERT)
+    #find out what the next character is
+    char = openDocuments[currentTab].get("%s-1c" % INSERT, INSERT)
+    
+    #if both of the characters were whitespace, then this should
+    #delete all the whitespace
+    if firstChar in string.whitespace and char in string.whitespace:
+        while char in string.whitespace:
+            openDocuments[currentTab].delete("%s-1c" % INSERT, INSERT)
+            char = openDocuments[currentTab].get("%s-1c" % INSERT, INSERT)
+            
+    #if both of the characters were punctuation, then this should
+    #delete all the punctuation
+    elif firstChar in string.punctuation and char in string.punctuation:
+        while char in string.punctuation:
+            openDocuments[currentTab].delete("%s-1c" % INSERT, INSERT)
+            char = openDocuments[currentTab].get("%s-1c" % INSERT, INSERT)
+
+    #otherwise, delete until whitespace or punctuation
+    else:
+        delimiters = string.whitespace + string.punctuation
+        while char not in delimiters:
+            openDocuments[currentTab].delete("%s-1c" % INSERT, INSERT)
+            char = openDocuments[currentTab].get("%s-1c" % INSERT, INSERT)
+               
+    #reset the length of a backspace
     lastLen = 1
-    char = '-'
-    while char not in " _\n.,":
-        openDocuments[currentTab].delete("%s-1c" % INSERT, INSERT)
-        char = openDocuments[currentTab].get("%s-1c" % INSERT, INSERT)
     status()
 
 #this adds special functionality to backspace, so that it deletes the
@@ -344,24 +376,24 @@ def backspace(var=None):
     lastLen = 1
     status()
 
-
-#this checks to make sure a function call is working
-def functionCheck(var=None):
-    print "Function call is working. Value is", var
-
 #this checks to see if the given document is saved
-def isSaved(docName):
-    return openDocuments[docName].cget("bg") == "#FFF"
+def isSaved(tab):
+    return tabs[tab].cget("bg") == "#FFF"
     
 #this moves the cursor around
 def setCursor(line, col):
+    global lastLen
+    lastLen = 1
     (currentLine, currentCol) = getPosition()
     newLine = currentLine + line
     newCol = currentCol + col
+    #this needs to check if the new column number wants to go off the
+    #end of the line. if it does, then it needs to go to the
+    #previous/next line
     openDocuments[currentTab].mark_set("insert", "%d.%d" % (newLine, newCol))
     #tabs[tab].cget("bg") == "#FFF"
-    status() #status(True) might work, but needs to reflect if the
-             #document is actually saved or not
+    status(isSaved(currentTab))
+    
 
 #this takes the line.col string and returns a (line, col)
 #representation
@@ -374,7 +406,6 @@ def getPosition():
 # - saved or not saved
 # - cursor position highlighting
 def status(saved=False):
-
     #this does the current position highlighting
     #this should be changed to a) remove all irrelevant tags, and
     #    b) also track the main text window, not just the text entry
@@ -391,6 +422,7 @@ def status(saved=False):
     #this will tell the user the current line and column number
     #print "%s" %openDocuments[currentTab].END#openDocuments[currentTab].INSERT
     positionLabel.config(text="(%d:%d)" %getPosition())
+    
 
 #this does the insertion into the editor window.
 def insert(string):
