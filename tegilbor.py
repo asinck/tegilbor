@@ -431,7 +431,7 @@ def insert(string):
     lastLen = len(string)
     openDocuments[currentTab].insert(INSERT, string)
     if (openDocuments[currentTab].get("%s-2c" % INSERT, "%s-1c" % INSERT) == '?') and \
-    (openDocuments[currentTab].get("%s-1c" % INSERT, "%s" % INSERT) != ' '):
+    (openDocuments[currentTab].get("%s-1c" % INSERT, "%s" % INSERT) not in [' ', '\n']):
         findQuickDef(openDocuments[currentTab].get("%s-1c" % INSERT, INSERT))
     status()
     openDocuments[currentTab].see(str(INSERT))
