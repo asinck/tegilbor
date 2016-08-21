@@ -41,7 +41,8 @@ currentTab = "Untitled 1" #this is the name of the initial tab
 currentTabShortName = currentTab.split("/")[-1]
 openDocuments = {}        #a hash table of documents
 tabs = {}                 #a hash table of the tabs that will allow the
-unnamedDocs = 0           #user to have multiple tabs open at once
+                          #user to have multiple tabs open at once
+unnamedDocs = 0
 quickDefs = {}
 lastLen = 1
 
@@ -162,6 +163,36 @@ def save(var=None):
     text.write(contents)
     tabs[currentTab].configure(bg = "#FFF")
 
+#this will refresh the currently displayed file.
+def refresh():
+    #TODO: check if the document is saved or not, to prevent two
+    #copies; maybe with a window focus check
+
+    #another issue is that this program lets you edit files that were
+    #modified in an external program. 
+    if (not isSaved(currentTab)):
+        answer = tkMessageBox.askyesno("File not saved", "Are you sure you want to refresh the file?") #returns a True or False
+        if (not answer):
+            return
+    contents = ""
+    try:
+        text = open(currentTab) #I think that's the filename
+        for line in text:
+            contents += line
+    except:
+        tkMessageBox.showerror("Error", "This file could not be opened.")
+        return
+
+    #there's actually an issue here, because the line reading appends
+    #a \n, and to take care of that I had to strip whitespace, which
+    #could also modify the contents. TODO: fix this. This also affects
+    #files that are opened
+    openDocuments[currentTab].delete("0.0", END)
+    openDocuments[currentTab].insert(0.0, contents)
+    openDocuments[currentTab].see(END)
+    status(True) #update the state of the document, including saved state
+        
+
 #this pops up a message to the user when the close the program,
 #reminding them to save everything.
 def warn():
@@ -172,7 +203,7 @@ def warn():
         if tabs[tab].cget("bg") != "#FFF":
             unsavedChanges = True
     if unsavedChanges:
-        if tkMessageBox.askokcancel("Save?", "Have you saved everything?"):
+        if tkMessageBox.askokcancel("Save?", "Close without saving?"):
             root.destroy()
     else:
         root.destroy()
@@ -470,6 +501,7 @@ menu.add_command(label = 'New document', command = newDoc, underline = 0)
 menu.add_command(label = 'Open...', command = openFile, underline = 0)
 menu.add_command(label = 'Save', command = save, underline = 0)
 menu.add_command(label = 'Save As...', command =saveAs, underline = 5)
+menu.add_command(label = 'Reload File', command = refresh, underline = 0)
 menu.add_command(label = 'Quit', command = warn, underline = 0)
 fileMenu['menu'] = menu
 

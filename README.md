@@ -36,6 +36,8 @@ This program uses the Tkinter GUI library. If it is not installed, you can't use
 * The length sorting for the lookup does not work properly.
 * The line/col indication is not correct (except by coincidence) if the user clicks in the text field.
 * The amount of text backspace deletes can be incorrect if the user moves the cursor and expects a single letter to be deleted when they hit backspace.
+* This program doesn't necessarily play well with other programs editing the same file at the same time. This program can refresh a file, but it won't do any sort of checks to warn against editing/saving a file modified outside of it.
+* Trailing whitespace is an issue (ie, doesn't necessarily read properly) when the program reads a file. It appends an extra newline to the displayed contents, which will be saved if the file is saved.
 
 ###Upcoming enhancements:
 #####File handling 
